@@ -1,0 +1,82 @@
+
+テスト環境作成
+
+
+その他コマンド==================================================================================================================
+
+vagrant box add myTestEnv https://github.com/2creatives/vagrant-centos/releases/download/v0.1.0/centos64-x86_64-20131030.box
+
+vagrant box remove Box名 PROVIDER
+
+
+テスト環境構築==================================================================================================================
+
+vagrant box add myTestEnv https://github.com/2creatives/vagrant-centos/releases/download/v0.1.0/centos64-x86_64-20131030.box
+
+vagrant init myTestEnv
+
+vagrant up
+    ※途中で出ているWarningが気になる
+    default: Warning: Remote connection disconnect. Retrying...
+    default: Warning: Remote connection disconnect. Retrying...
+
+vagrant halt
+
+vim Vagrantfile
+    #追加
+    config.vm.network "private_network", ip: "192.168.33.10"
+    config.vm.hostname="myTestEnv"
+
+vagrant up
+
+vagrant ssh
+
+sudo su - root
+
+yum install httpd php php-mysql mysql*
+    #エラーでおこられたので、一時的に変数を変更
+    LC_ALL=C
+    export LC_ALL
+    yum update
+    
+service httpd start
+
+vi /var/www/html/index.php
+    ＃以下を記述
+    <?php
+      phpinfo();
+    ?>
+
+service mysqld start
+
+mysql -uroot -p
+    use test
+    create table tmp(id int(5), text text);
+    insert into tmp(id,text) values(1,'tmpText');
+    
+vi /var/www/html/index.php
+    ＃以下を記述
+    <?php
+      $link = mysql_connect('localhost', 'root', '');
+      if (!$link) {
+       die('接続失敗です。'.mysql_error());
+      }
+
+      $db_selected = mysql_select_db('test', $link);
+      if (!$db_selected){
+       die('データベース選択失敗です。'.mysql_error());
+      }
+
+      $result = mysql_query('SELECT * FROM tmp');
+      if (!$result) {
+       die('クエリーが失敗しました。'.mysql_error());
+      }
+      $row = mysql_fetch_assoc($result);
+      print($row['id']);
+      print($row['text']);
+      mysql_close($link);
+    ?>
+
+▼ブラウザでの確認
+http://192.168.33.10/index.php
+
