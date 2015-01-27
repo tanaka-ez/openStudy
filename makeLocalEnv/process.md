@@ -15,7 +15,7 @@ mkdir centos && cd centos
 vagrant init cent65
 ```
 
-- Vagrantfileの編集
+- Vagrantfileを下記の通りに編集
 
 ```
 # -*- mode: ruby -*-
@@ -72,6 +72,8 @@ vagrant ssh
 # LAMP環境を構築してみる
 
 ## Apache,phpをインストール
+
+- ライブラリのインストール
 
 ```sh
 sudo yum install -y httpd php php-mysql
